@@ -22,7 +22,6 @@
   ],
   "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
   "dependencies": {
-    "less": "~1.7.0"
   },
   "devDependencies": {
     "mocha": "~1.15.1",
