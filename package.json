@@ -1,38 +1,37 @@
 {
-  "path": "/Users/psteeleidem/development/github/raptorjs3/raptor-optimizer-rhtml/package.json",
-  "name": "raptor-optimizer-rhtml",
-  "description": "RaptorJS Optimizer plugin to support compilation of Raptor Template files",
-  "keywords": [
-    "less",
-    "raptor",
-    "optimizer",
-    "css"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/raptorjs/raptor-optimizer-rhtml.git"
-  },
-  "scripts": {
-    "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
-  },
-  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
-  "contributors": [
-    "Patrick Steele-Idem <pnidem@gmail.com>",
-    "Phillip Gates-Idem <phillip.idem@gmail.com>"
-  ],
-  "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
-  "dependencies": {
-  },
-  "devDependencies": {
-    "mocha": "~1.15.1",
-    "chai": "~1.8.1"
-  },
-  "license": "Apache License v2.0",
-  "bin": {},
-  "main": "lib/raptor-optimizer-rhtml.js",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "ebay": {},
-  "version": "0.1.0-beta"
+    "path": "/Users/psteeleidem/development/github/raptorjs3/raptor-optimizer-rhtml/package.json",
+    "name": "raptor-optimizer-rhtml",
+    "description": "RaptorJS Optimizer plugin to support compilation of Raptor Template files",
+    "keywords": [
+        "less",
+        "raptor",
+        "optimizer",
+        "css"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/raptorjs/raptor-optimizer-rhtml.git"
+    },
+    "scripts": {
+        "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
+    },
+    "author": "Patrick Steele-Idem <pnidem@gmail.com>",
+    "contributors": [
+        "Patrick Steele-Idem <pnidem@gmail.com>",
+        "Phillip Gates-Idem <phillip.idem@gmail.com>"
+    ],
+    "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
+    "dependencies": {},
+    "devDependencies": {
+        "mocha": "~1.15.1",
+        "chai": "~1.8.1"
+    },
+    "license": "Apache License v2.0",
+    "bin": {},
+    "main": "lib/raptor-optimizer-rhtml.js",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "ebay": {},
+    "version": "0.1.1-beta"
 }
