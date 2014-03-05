@@ -1,4 +1,5 @@
 {
+    "path": "/Users/psteeleidem/development/github/raptorjs3/raptor-optimizer-rhtml/package.json",
     "name": "raptor-optimizer-rhtml",
     "description": "RaptorJS Optimizer plugin to support compilation of Raptor Template files",
     "keywords": [
@@ -32,5 +33,5 @@
         "registry": "https://registry.npmjs.org/"
     },
     "ebay": {},
-    "version": "0.1.1-beta"
+    "version": "0.1.2-beta"
 }
