@@ -2,10 +2,9 @@
     "name": "raptor-optimizer-rhtml",
     "description": "RaptorJS Optimizer plugin to support compilation of Raptor Template files",
     "keywords": [
-        "less",
-        "raptor",
-        "optimizer",
-        "css"
+        "raptor-optimizer",
+        "raptor-optimizer-plugin",
+        "raptor-templates"
     ],
     "repository": {
         "type": "git",
