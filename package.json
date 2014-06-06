@@ -20,11 +20,11 @@
     ],
     "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
     "dependencies": {
-        "raptor-templates": "^0.2.12-beta"
     },
     "devDependencies": {
         "mocha": "~1.15.1",
-        "chai": "~1.8.1"
+        "chai": "~1.8.1",
+        "raptor-templates": "^1.1.0-beta"
     },
     "license": "Apache License v2.0",
     "bin": {},
