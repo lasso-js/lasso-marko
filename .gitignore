@@ -7,3 +7,5 @@
 *.orig
 .DS_Store
 coverage
+.cache/
+static/
