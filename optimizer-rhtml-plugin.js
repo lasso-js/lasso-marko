@@ -9,19 +9,20 @@ module.exports = function(optimizer, config) {
                 'path': 'string'
             },
 
-            init: function() {
+            init: function(optimizerContext, callback) {
                 if (!this.path) {
-                    throw new Error('"path" is required for a Raptor Templates dependency');
+                    return callback(new Error('"path" is required for a Raptor Templates dependency'));
                 }
 
                 this.path = this.resolvePath(this.path);
+                callback();
             },
 
             read: function(optimizerContext, callback) {
                 raptorTemplatesCompiler.compileFile(this.path, callback);
             },
 
-            lastModified: function(optimizerContext, callback) {
+            getLastModified: function(optimizerContext, callback) {
                 raptorTemplatesCompiler.getLastModified(this.path, callback);
             }
         });

@@ -29,7 +29,7 @@
     },
     "license": "Apache License v2.0",
     "bin": {},
-    "main": "lib/raptor-optimizer-rhtml-plugin.js",
+    "main": "./optimizer-rhtml-plugin.js",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
