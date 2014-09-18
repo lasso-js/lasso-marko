@@ -59,9 +59,51 @@ describe('raptor-optimizer-rhtml' , function() {
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), 'utf8');
                 expect(output).to.contain("simple.rhtml");
                 expect(output).to.contain("data.name");
+                raptorOptimizer.flushAllCaches(done);
+            });
+    });
 
-                setTimeout(done, 1000);
-                // done();
+    it.only('should render a simple rhtml dependency that uses require', function(done) {
+
+        var pageOptimizer = raptorOptimizer.create({
+                fileWriter: {
+                    fingerprintsEnabled: false,
+                    outputDir: nodePath.join(__dirname, 'static')
+                },
+                bundlingEnabled: true,
+                plugins: [
+                    {
+                        plugin: rhtmlPlugin,
+                        config: {
+
+                        }
+                    },
+                    {
+                        plugin: 'raptor-optimizer-require',
+                        config: {
+                            includeClient: false
+                        }
+                    }
+                ]
+            });
+
+        pageOptimizer.optimizePage({
+                name: 'testPage',
+                dependencies: [
+                    'require: ./simple.rhtml'
+                ],
+                from: nodePath.join(__dirname, 'fixtures/project1')
+            },
+            function(err, optimizedPage) {
+                if (err) {
+                    return done(err);
+                }
+
+                var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), 'utf8');
+                expect(output).to.contain("simple.rhtml");
+                expect(output).to.contain("data.name");
+
+                raptorOptimizer.flushAllCaches(done);
             });
     });
 
