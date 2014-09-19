@@ -1,5 +1,5 @@
 {
     "dependencies": [
-        "simple.rhtml"
+        "simple.marko"
     ]
 }

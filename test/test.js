@@ -6,10 +6,10 @@ var expect = require('chai').expect;
 var nodePath = require('path');
 var fs = require('fs');
 
-var rhtmlPlugin = require('../'); // Load this module just to make sure it works
-var raptorOptimizer = require('raptor-optimizer');
+var markoPlugin = require('../'); // Load this module just to make sure it works
+var optimizer = require('optimizer');
 
-describe('raptor-optimizer-rhtml' , function() {
+describe('optimizer-marko' , function() {
 
     beforeEach(function(done) {
         for (var k in require.cache) {
@@ -20,9 +20,9 @@ describe('raptor-optimizer-rhtml' , function() {
         done();
     });
 
-    it('should render a simple rhtml dependency', function(done) {
+    it('should render a simple marko dependency', function(done) {
 
-        var pageOptimizer = raptorOptimizer.create({
+        var pageOptimizer = optimizer.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -30,13 +30,13 @@ describe('raptor-optimizer-rhtml' , function() {
                 bundlingEnabled: true,
                 plugins: [
                     {
-                        plugin: rhtmlPlugin,
+                        plugin: markoPlugin,
                         config: {
 
                         }
                     },
                     {
-                        plugin: 'raptor-optimizer-require',
+                        plugin: 'optimizer-require',
                         config: {
                             includeClient: false
                         }
@@ -47,7 +47,7 @@ describe('raptor-optimizer-rhtml' , function() {
         pageOptimizer.optimizePage({
                 name: 'testPage',
                 dependencies: [
-                    nodePath.join(__dirname, 'fixtures/project1/simple.rhtml')
+                    nodePath.join(__dirname, 'fixtures/project1/simple.marko')
                 ],
                 from: nodePath.join(__dirname, 'fixtures/project1')
             },
@@ -57,15 +57,15 @@ describe('raptor-optimizer-rhtml' , function() {
                 }
 
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), 'utf8');
-                expect(output).to.contain("simple.rhtml");
+                expect(output).to.contain("simple.marko");
                 expect(output).to.contain("data.name");
-                raptorOptimizer.flushAllCaches(done);
+                optimizer.flushAllCaches(done);
             });
     });
 
-    it.only('should render a simple rhtml dependency that uses require', function(done) {
+    it.only('should render a simple marko dependency that uses require', function(done) {
 
-        var pageOptimizer = raptorOptimizer.create({
+        var pageOptimizer = optimizer.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -73,13 +73,13 @@ describe('raptor-optimizer-rhtml' , function() {
                 bundlingEnabled: true,
                 plugins: [
                     {
-                        plugin: rhtmlPlugin,
+                        plugin: markoPlugin,
                         config: {
 
                         }
                     },
                     {
-                        plugin: 'raptor-optimizer-require',
+                        plugin: 'optimizer-require',
                         config: {
                             includeClient: false
                         }
@@ -90,7 +90,7 @@ describe('raptor-optimizer-rhtml' , function() {
         pageOptimizer.optimizePage({
                 name: 'testPage',
                 dependencies: [
-                    'require: ./simple.rhtml'
+                    'require: ./simple.marko'
                 ],
                 from: nodePath.join(__dirname, 'fixtures/project1')
             },
@@ -100,10 +100,10 @@ describe('raptor-optimizer-rhtml' , function() {
                 }
 
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), 'utf8');
-                expect(output).to.contain("simple.rhtml");
+                expect(output).to.contain("simple.marko");
                 expect(output).to.contain("data.name");
 
-                raptorOptimizer.flushAllCaches(done);
+                optimizer.flushAllCaches(done);
             });
     });
 

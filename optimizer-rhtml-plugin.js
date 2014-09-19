@@ -1,9 +1,9 @@
-var raptorTemplatesCompiler = require('raptor-templates/compiler');
+var markoCompiler = require('marko/compiler');
 
 module.exports = function(optimizer, config) {
 
     optimizer.dependencies.registerRequireType(
-        'rhtml',
+        'marko',
         {
             properties: {
                 'path': 'string'
@@ -11,7 +11,7 @@ module.exports = function(optimizer, config) {
 
             init: function(optimizerContext, callback) {
                 if (!this.path) {
-                    return callback(new Error('"path" is required for a Raptor Templates dependency'));
+                    return callback(new Error('"path" is required for a Marko dependency'));
                 }
 
                 this.path = this.resolvePath(this.path);
@@ -19,11 +19,11 @@ module.exports = function(optimizer, config) {
             },
 
             read: function(optimizerContext, callback) {
-                raptorTemplatesCompiler.compileFile(this.path, callback);
+                markoCompiler.compileFile(this.path, callback);
             },
 
             getLastModified: function(optimizerContext, callback) {
-                raptorTemplatesCompiler.getLastModified(this.path, callback);
+                markoCompiler.getLastModified(this.path, callback);
             }
         });
 };
