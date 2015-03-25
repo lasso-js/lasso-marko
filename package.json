@@ -1,37 +1,38 @@
 {
-    "name": "optimizer-marko",
-    "description": "RaptorJS Optimizer plugin to support compilation of Marko templates",
-    "keywords": [
-        "optimizer",
-        "optimizer-plugin",
-        "marko"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/raptorjs/optimizer-marko.git"
-    },
-    "scripts": {
-        "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
-    },
-    "author": "Patrick Steele-Idem <pnidem@gmail.com>",
-    "contributors": [
-        "Patrick Steele-Idem <pnidem@gmail.com>",
-        "Phillip Gates-Idem <phillip.idem@gmail.com>"
-    ],
-    "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
-    "dependencies": {
-        "marko": "^2"
-    },
-    "devDependencies": {
-        "chai": "~1.8.1",
-        "mocha": "~1.15.1",
-        "optimizer": "^1.0.10"
-    },
-    "license": "Apache License v2.0",
-    "bin": {},
-    "main": "./optimizer-marko-plugin.js",
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
-    },
-    "version": "2.0.0"
+  "name": "optimizer-marko",
+  "description": "RaptorJS Optimizer plugin to support compilation of Marko templates",
+  "keywords": [
+    "optimizer",
+    "optimizer-plugin",
+    "marko"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raptorjs/optimizer-marko.git"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
+  },
+  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
+  "contributors": [
+    "Patrick Steele-Idem <pnidem@gmail.com>",
+    "Phillip Gates-Idem <phillip.idem@gmail.com>"
+  ],
+  "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "~1.8.1",
+    "mocha": "~1.15.1",
+    "optimizer": "^1.0.10"
+  },
+  "peerDependencies": {
+      "marko": ">1.0.0"
+  },
+  "license": "Apache License v2.0",
+  "bin": {},
+  "main": "./optimizer-marko-plugin.js",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "version": "2.0.0"
 }
