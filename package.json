@@ -22,11 +22,12 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "~1.8.1",
+    "marko": "^2.2.0",
     "mocha": "~1.15.1",
     "optimizer": "^1.0.10"
   },
   "peerDependencies": {
-      "marko": ">1.0.0"
+    "marko": ">1.0.0"
   },
   "license": "Apache License v2.0",
   "bin": {},
