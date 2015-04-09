@@ -51,7 +51,7 @@ describe('lasso-marko' , function() {
                 ],
                 from: nodePath.join(__dirname, 'fixtures/project1')
             },
-            function(err, optimizedPage) {
+            function(err, lassoPageResult) {
                 if (err) {
                     return done(err);
                 }
@@ -94,7 +94,7 @@ describe('lasso-marko' , function() {
                 ],
                 from: nodePath.join(__dirname, 'fixtures/project1')
             },
-            function(err, optimizedPage) {
+            function(err, lassoPageResult) {
                 if (err) {
                     return done(err);
                 }
