@@ -1,20 +1,20 @@
-optimizer-marko
+lasso-marko
 ===============
 
-Plugin for the [RaptorJS Optimizer](https://github.com/raptorjs/optimizer) to support compilation and transport of [Marko](https://github.com/raptorjs/marko) template files. Templates are compiled using the [Marko](https://github.com/raptorjs/marko) compiler that produces a CommonJS module as output.
+Plugin for the [RaptorJS Optimizer](https://github.com/raptorjs/lasso) to support compilation and transport of [Marko](https://github.com/raptorjs/marko) template files. Templates are compiled using the [Marko](https://github.com/raptorjs/marko) compiler that produces a CommonJS module as output.
 
 # Usage
 
 ```bash
-npm install optimizer-marko --save
+npm install lasso-marko --save
 ```
 
-Register the plugin when configuring the optimizer. For example:
+Register the plugin when configuring the lasso. For example:
 ```js
-require('optimizer').configure({
+require('lasso').configure({
     "plugins": [
         ...
-        "optimizer-marko"
+        "lasso-marko"
     ]
     ...
 });

@@ -7,9 +7,9 @@ var nodePath = require('path');
 var fs = require('fs');
 
 var markoPlugin = require('../'); // Load this module just to make sure it works
-var optimizer = require('optimizer');
+var lasso = require('lasso');
 
-describe('optimizer-marko' , function() {
+describe('lasso-marko' , function() {
 
     beforeEach(function(done) {
         for (var k in require.cache) {
@@ -22,7 +22,7 @@ describe('optimizer-marko' , function() {
 
     it('should render a simple marko dependency', function(done) {
 
-        var pageOptimizer = optimizer.create({
+        var pageOptimizer = lasso.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -36,7 +36,7 @@ describe('optimizer-marko' , function() {
                         }
                     },
                     {
-                        plugin: 'optimizer-require',
+                        plugin: 'lasso-require',
                         config: {
                             includeClient: false
                         }
@@ -59,13 +59,13 @@ describe('optimizer-marko' , function() {
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), 'utf8');
                 expect(output).to.contain("simple.marko");
                 expect(output).to.contain("data.name");
-                optimizer.flushAllCaches(done);
+                lasso.flushAllCaches(done);
             });
     });
 
     it.only('should render a simple marko dependency that uses require', function(done) {
 
-        var pageOptimizer = optimizer.create({
+        var pageOptimizer = lasso.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -79,7 +79,7 @@ describe('optimizer-marko' , function() {
                         }
                     },
                     {
-                        plugin: 'optimizer-require',
+                        plugin: 'lasso-require',
                         config: {
                             includeClient: false
                         }
@@ -103,7 +103,7 @@ describe('optimizer-marko' , function() {
                 expect(output).to.contain("simple.marko");
                 expect(output).to.contain("data.name");
 
-                optimizer.flushAllCaches(done);
+                lasso.flushAllCaches(done);
             });
     });
 

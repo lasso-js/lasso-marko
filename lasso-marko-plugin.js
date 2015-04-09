@@ -1,15 +1,15 @@
 var markoCompiler = require('marko/compiler');
 
-module.exports = function(optimizer, config) {
+module.exports = function(lasso, config) {
 
-    optimizer.dependencies.registerRequireType(
+    lasso.dependencies.registerRequireType(
         'marko',
         {
             properties: {
                 'path': 'string'
             },
 
-            init: function(optimizerContext, callback) {
+            init: function(lassoContext, callback) {
                 if (!this.path) {
                     return callback(new Error('"path" is required for a Marko dependency'));
                 }
@@ -18,11 +18,11 @@ module.exports = function(optimizer, config) {
                 callback();
             },
 
-            read: function(optimizerContext, callback) {
+            read: function(lassoContext, callback) {
                 markoCompiler.compileFile(this.path, callback);
             },
 
-            getLastModified: function(optimizerContext, callback) {
+            getLastModified: function(lassoContext, callback) {
                 markoCompiler.getLastModified(this.path, callback);
             }
         });
