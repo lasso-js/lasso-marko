@@ -1,7 +1,7 @@
 lasso-marko
 ===============
 
-Plugin for the [RaptorJS Optimizer](https://github.com/raptorjs/lasso) to support compilation and transport of [Marko](https://github.com/raptorjs/marko) template files. Templates are compiled using the [Marko](https://github.com/raptorjs/marko) compiler that produces a CommonJS module as output.
+Plugin for the [Lasso.js](https://github.com/raptorjs/lasso) to support compilation and transport of [Marko](https://github.com/raptorjs/marko) template files. Templates are compiled using the [Marko](https://github.com/raptorjs/marko) compiler that produces a CommonJS module as output.
 
 # Usage
 
