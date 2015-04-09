@@ -22,7 +22,7 @@ describe('lasso-marko' , function() {
 
     it('should render a simple marko dependency', function(done) {
 
-        var pageOptimizer = lasso.create({
+        var myLasso = lasso.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -44,7 +44,7 @@ describe('lasso-marko' , function() {
                 ]
             });
 
-        pageOptimizer.optimizePage({
+        myLasso.optimizePage({
                 name: 'testPage',
                 dependencies: [
                     nodePath.join(__dirname, 'fixtures/project1/simple.marko')
@@ -65,7 +65,7 @@ describe('lasso-marko' , function() {
 
     it.only('should render a simple marko dependency that uses require', function(done) {
 
-        var pageOptimizer = lasso.create({
+        var myLasso = lasso.create({
                 fileWriter: {
                     fingerprintsEnabled: false,
                     outputDir: nodePath.join(__dirname, 'static')
@@ -87,7 +87,7 @@ describe('lasso-marko' , function() {
                 ]
             });
 
-        pageOptimizer.optimizePage({
+        myLasso.optimizePage({
                 name: 'testPage',
                 dependencies: [
                     'require: ./simple.marko'
