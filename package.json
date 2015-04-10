@@ -24,7 +24,7 @@
         "chai": "~1.8.1",
         "marko": "^2.2.0",
         "mocha": "~1.15.1",
-        "lasso": "^1.0.10"
+        "lasso": "^1.8.4"
     },
     "peerDependencies": {
         "marko": ">1.0.0"
