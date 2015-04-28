@@ -1,7 +1,5 @@
-var markoCompiler = require('marko/compiler');
-
 module.exports = function(lasso, config) {
-
+    var markoCompiler = config.compiler || require('marko/compiler');
     lasso.dependencies.registerRequireType(
         'marko',
         {
