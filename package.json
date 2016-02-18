@@ -1,37 +1,37 @@
 {
-    "name": "lasso-marko",
-    "description": "Lasso.js plugin to support compilation of Marko templates",
-    "keywords": [
-        "lasso",
-        "lasso-plugin",
-        "marko"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/lasso-js/lasso-marko.git"
-    },
-    "scripts": {
-        "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
-    },
-    "author": "Patrick Steele-Idem <pnidem@gmail.com>",
-    "contributors": [
-        "Patrick Steele-Idem <pnidem@gmail.com>",
-        "Phillip Gates-Idem <phillip.idem@gmail.com>"
-    ],
-    "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
-    "devDependencies": {
-        "chai": "~1.8.1",
-        "marko": "* >=3.0.0-alpha.1",
-        "lasso": "^2.0.0"
-    },
-    "peerDependencies": {
-        "marko": "* >=3.0.0-alpha.1"
-    },
-    "license": "Apache License v2.0",
-    "bin": {},
-    "main": "./lasso-marko-plugin.js",
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
-    },
-    "version": "2.0.5"
+  "name": "lasso-marko",
+  "description": "Lasso.js plugin to support compilation of Marko templates",
+  "keywords": [
+    "lasso",
+    "lasso-plugin",
+    "marko"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lasso-js/lasso-marko.git"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
+  },
+  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
+  "contributors": [
+    "Patrick Steele-Idem <pnidem@gmail.com>",
+    "Phillip Gates-Idem <phillip.idem@gmail.com>"
+  ],
+  "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
+  "devDependencies": {
+    "chai": "~1.8.1",
+    "marko": "* >=3.0.0-alpha.1",
+    "lasso": "^2.0.0"
+  },
+  "peerDependencies": {
+    "marko": "* >=3.0.0-alpha.1"
+  },
+  "license": "Apache License v2.0",
+  "bin": {},
+  "main": "./lasso-marko-plugin.js",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "version": "2.0.6"
 }
