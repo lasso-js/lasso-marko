@@ -19,15 +19,13 @@
         "Phillip Gates-Idem <phillip.idem@gmail.com>"
     ],
     "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
-    "dependencies": {},
     "devDependencies": {
         "chai": "~1.8.1",
-        "marko": "^2.2.0",
-        "mocha": "~1.15.1",
-        "lasso": "^1.8.4"
+        "marko": "* >=3.0.0-alpha.1",
+        "lasso": "^2.0.0"
     },
     "peerDependencies": {
-        "marko": "*"
+        "marko": "* >=3.0.0-alpha.1"
     },
     "license": "Apache License v2.0",
     "bin": {},
