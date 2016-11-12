@@ -63,7 +63,7 @@ describe('lasso-marko' , function() {
             });
     });
 
-    it.only('should render a simple marko dependency that uses require', function(done) {
+    it('should render a simple marko dependency that uses require', function(done) {
 
         var myLasso = lasso.create({
                 fileWriter: {

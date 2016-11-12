@@ -1,5 +1,12 @@
 module.exports = function(lasso, config) {
     var markoCompiler = config.compiler || require('marko/compiler');
+
+    var defaultOutput = markoCompiler.isVDOMSupported ? 'vdom' : 'html';
+
+    var compilerOptions = {
+        output: config.output || defaultOutput
+    };
+
     lasso.dependencies.registerRequireType(
         'marko',
         {
@@ -17,7 +24,7 @@ module.exports = function(lasso, config) {
             },
 
             read: function(lassoContext, callback) {
-                markoCompiler.compileFile(this.path, callback);
+                markoCompiler.compileFile(this.path, compilerOptions, callback);
             },
 
             getLastModified: function(lassoContext, callback) {
