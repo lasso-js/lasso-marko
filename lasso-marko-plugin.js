@@ -24,7 +24,11 @@ module.exports = function(lasso, config) {
             },
 
             read: function(lassoContext, callback) {
-                markoCompiler.compileFile(this.path, compilerOptions, callback);
+                if (markoCompiler.compileFileForBrowser) {
+                    markoCompiler.compileFileForBrowser(this.path, compilerOptions, callback);                    
+                } else {
+                    markoCompiler.compileFile(this.path, compilerOptions, callback);
+                }
             },
 
             getLastModified: function(lassoContext, callback) {
