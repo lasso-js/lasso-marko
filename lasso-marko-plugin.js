@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(lasso, config) {
     var markoCompiler = config.compiler || require('marko/compiler');
 
@@ -20,15 +22,25 @@ module.exports = function(lasso, config) {
                 }
 
                 this.path = this.resolvePath(this.path);
+
+                if (markoCompiler.compileFileForBrowser) {
+                    this._compiled = markoCompiler.compileFileForBrowser(this.path, compilerOptions);
+                } else {
+                    var code = markoCompiler.compileFile(this.path, compilerOptions);
+                    this._compiled = {
+                        code: code
+                    };
+                }
+
                 callback();
             },
 
+            getDependencies: function(lassoContext) {
+                return this._compiled.dependencies;
+            },
+
             read: function(lassoContext, callback) {
-                if (markoCompiler.compileFileForBrowser) {
-                    markoCompiler.compileFileForBrowser(this.path, compilerOptions, callback);                    
-                } else {
-                    markoCompiler.compileFile(this.path, compilerOptions, callback);
-                }
+                return this._compiled.code;
             },
 
             getLastModified: function(lassoContext, callback) {
