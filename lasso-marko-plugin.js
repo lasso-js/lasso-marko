@@ -36,11 +36,11 @@ module.exports = function(lasso, config) {
             },
 
             getDependencies: function(lassoContext) {
-                return this._compiled.dependencies;
+                return this._compiled.dependencies || [];
             },
 
-            read: function(lassoContext, callback) {
-                return this._compiled.code;
+            read: function(lassoContext) {
+                return this._compiled.code || null;
             },
 
             getLastModified: function(lassoContext, callback) {
