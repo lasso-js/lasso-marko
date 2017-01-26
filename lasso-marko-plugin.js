@@ -25,14 +25,23 @@ module.exports = function(lasso, config) {
 
                 if (markoCompiler.compileFileForBrowser) {
                     this._compiled = markoCompiler.compileFileForBrowser(this.path, compilerOptions);
-                } else {
-                    var code = markoCompiler.compileFile(this.path, compilerOptions);
-                    this._compiled = {
-                        code: code
-                    };
-                }
+                    callback();
 
-                callback();
+                } else {
+                    var self = this;
+
+                    markoCompiler.compileFile(this.path, compilerOptions, function(err, code) {
+                        if (err) {
+                            return callback(err);
+                        }
+
+                        self._compiled = {
+                            code: code
+                        };
+
+                        callback();
+                    });
+                }
             },
 
             getDependencies: function(lassoContext) {
@@ -40,7 +49,7 @@ module.exports = function(lasso, config) {
             },
 
             read: function(lassoContext) {
-                return this._compiled.code || null;
+                return (this._compiled && this._compiled.code) || null;
             },
 
             getLastModified: function(lassoContext, callback) {
