@@ -1,6 +1,19 @@
 'use strict';
+var minprops = require('minprops');
+
+var isDevelopment =
+    !process.env.NODE_ENV ||
+    process.env.NODE_ENV === 'development' ||
+    process.env.NODE_ENV === 'dev';
 
 module.exports = function(lasso, config) {
+    config = config || {};
+
+    var minpropsEnabled = config.minpropsEnabled;
+    if (minpropsEnabled == null) {
+        minpropsEnabled = !isDevelopment;
+    }
+
     var markoCompiler = config.compiler || require('marko/compiler');
 
     var defaultOutput = markoCompiler.isVDOMSupported ? 'vdom' : 'html';
@@ -56,4 +69,23 @@ module.exports = function(lasso, config) {
                 markoCompiler.getLastModified(this.path, callback);
             }
         });
+
+    if (minpropsEnabled) {
+        lasso.addTransform({
+            contentType: 'js',
+
+            name: module.id,
+
+            stream: false,
+
+            transform: function(code, lassoContext) {
+                var filename = lassoContext.path || lassoContext.filename || lassoContext.dir;
+                if (!filename) {
+                    return code;
+                }
+
+                return minprops(code, filename);
+            }
+        });
+    }
 };

@@ -32,5 +32,8 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "2.2.2"
+  "version": "2.2.2",
+  "dependencies": {
+    "minprops": "^1.0.0"
+  }
 }
