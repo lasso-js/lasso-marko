@@ -58,7 +58,7 @@ describe('lasso-marko' , function() {
 
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), {encoding: 'utf8'});
                 expect(output).to.contain("simple.marko");
-                expect(output).to.contain("data.name");
+                expect(output).to.contain("input.name");
                 lasso.flushAllCaches(done);
             });
     });
@@ -101,7 +101,7 @@ describe('lasso-marko' , function() {
 
                 var output = fs.readFileSync(nodePath.join(__dirname, 'static/testPage.js'), {encoding: 'utf8'});
                 expect(output).to.contain("simple.marko");
-                expect(output).to.contain("data.name");
+                expect(output).to.contain("input.name");
 
                 lasso.flushAllCaches(done);
             });
