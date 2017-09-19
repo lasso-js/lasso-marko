@@ -13,7 +13,7 @@ describe('lasso-marko' , function() {
 
     beforeEach(function(done) {
         for (var k in require.cache) {
-            if (require.cache.hasOwnProperty(k)) {
+            if (require.cache[k]) {
                 delete require.cache[k];
             }
         }
