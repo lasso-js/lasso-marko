@@ -1,10 +1,25 @@
 'use strict';
+
 var minprops = require('minprops');
 
 var isDevelopment =
     !process.env.NODE_ENV ||
     process.env.NODE_ENV === 'development' ||
     process.env.NODE_ENV === 'dev';
+
+function compileForServer (context, markoCompiler, compilerOptions, callback) {
+    markoCompiler.compileFile(context.path, compilerOptions, function (err, code) {
+        if (err) {
+            return callback(err);
+        }
+
+        context._compiled = {
+            code: code
+        };
+
+        callback();
+    });
+}
 
 module.exports = function(lasso, config) {
     config = config || {};
@@ -29,31 +44,29 @@ module.exports = function(lasso, config) {
                 'path': 'string'
             },
 
-            init: function(lassoContext, callback) {
+            init: function (lassoContext, callback) {
                 if (!this.path) {
-                    return callback(new Error('"path" is required for a Marko dependency'));
+                    throw new Error('"path" is required for a Marko dependency');
                 }
 
                 this.path = this.resolvePath(this.path);
 
                 if (markoCompiler.compileFileForBrowser) {
                     this._compiled = markoCompiler.compileFileForBrowser(this.path, compilerOptions);
-                    callback();
 
-                } else {
-                    var self = this;
-
-                    markoCompiler.compileFile(this.path, compilerOptions, function(err, code) {
-                        if (err) {
-                            return callback(err);
-                        }
-
-                        self._compiled = {
-                            code: code
-                        };
-
+                    if (callback) {
                         callback();
-                    });
+                    }
+                } else {
+                    if (callback) {
+                        compileForServer(this, markoCompiler, compilerOptions, callback);
+                    } else {
+                        return new Promise((resolve, reject) => {
+                            compileForServer(this, markoCompiler, compilerOptions, function (err) {
+                                return err ? reject(err) : resolve();
+                            });
+                        });
+                    }
                 }
             },
 
@@ -66,7 +79,15 @@ module.exports = function(lasso, config) {
             },
 
             getLastModified: function(lassoContext, callback) {
-                markoCompiler.getLastModified(this.path, callback);
+                if (callback) {
+                    markoCompiler.getLastModified(this.path, callback);
+                } else {
+                    return new Promise((resolve, reject) => {
+                        markoCompiler.getLastModified(this.path, function (err, data) {
+                            return err ? reject(err) : resolve(data);
+                        });
+                    });
+                }
             }
         });
 
