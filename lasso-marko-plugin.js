@@ -133,13 +133,12 @@ module.exports = function(lasso, config) {
                     type: 'marko-dependencies',
                     path: require.resolve(this.resolvePath(this.path))
                 },
-                // TODO: this should only be loaded if the page contains components
                 {
                     type: 'require',
                     run: true,
                     virtualModule: getVirtualModule({
                         path: this.path + '.init.js',
-                        code: `require('marko/components').init()`
+                        code: `window.$initComponents && window.$initComponents()`
                     })
                 }
             ];
