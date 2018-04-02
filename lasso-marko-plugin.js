@@ -95,10 +95,15 @@ module.exports = function(lasso, config) {
                 });
             } else {
                 if (meta.deps) {
-                    dependencies = dependencies.concat(meta.deps.map(depPath => ({
-                        type: 'require',
-                        path: require.resolve(this.resolvePath(depPath, nodePath.dirname(this.path)))
-                    })));
+                    dependencies = dependencies.concat(meta.deps.map(dep => (
+                        dep.code ? {
+                            type: dep.type,
+                            code: dep.code 
+                        } : {
+                            type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
+                            path: this.resolvePath(dep, nodePath.dirname(this.path))
+                        }
+                    )));
                 }
 
                 if (meta.tags) {
@@ -106,7 +111,7 @@ module.exports = function(lasso, config) {
                     // any tags that are used by this template
                     dependencies = dependencies.concat(meta.tags.map(tagPath => ({
                         type: 'marko-dependencies',
-                        path: require.resolve(this.resolvePath(tagPath, nodePath.dirname(this.path)))
+                        path: this.resolvePath(tagPath, nodePath.dirname(this.path))
                     })));
                 }
             }

@@ -21,7 +21,7 @@
   "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
   "devDependencies": {
     "chai": "^3.5.0",
-    "lasso": "^2.0.0",
+    "lasso": "^3.1.4",
     "marko": "^4.3.1",
     "mocha": "^3.2.0"
   },
