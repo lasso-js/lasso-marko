@@ -121,4 +121,27 @@ describe('lasso-marko' , function() {
             return lasso.flushAllCaches();
         });
     });
+
+    it('should bundle a split component with its dependencies', function() {
+        if (require('lasso/package').version[0] < 3) this.skip();
+
+        var myLasso = lasso.create(config);
+
+        return myLasso.lassoPage({
+            name: 'dependencies',
+            dependencies: [
+                'marko-dependencies: ./split.marko'
+            ],
+            from: nodePath.join(__dirname, 'fixtures/project2')
+        }).then((lassoPageResult) => {
+            var JS = fs.readFileSync(nodePath.join(__dirname, 'static/dependencies.js'), {encoding: 'utf8'});
+            var CSS = fs.readFileSync(nodePath.join(__dirname, 'static/dependencies.css'), {encoding: 'utf8'});
+            expect(JS).to.not.contain("split.marko");
+            expect(JS).to.not.contain("TEMPLATE");
+            expect(JS).to.contain("TEST");
+            expect(JS).to.contain("MOUNT");
+            expect(CSS).to.contain("blue");
+            return lasso.flushAllCaches();
+        });
+    });
 });

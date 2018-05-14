@@ -93,27 +93,27 @@ module.exports = function(lasso, config) {
                         );`
                     })
                 });
-            } else {
-                if (meta.deps) {
-                    dependencies = dependencies.concat(meta.deps.map(dep => (
-                        dep.code ? {
-                            type: dep.type,
-                            code: dep.code 
-                        } : {
-                            type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
-                            path: this.resolvePath(dep, nodePath.dirname(this.path))
-                        }
-                    )));
-                }
+            } 
+            
+            if (meta.deps) {
+                dependencies = dependencies.concat(meta.deps.map(dep => (
+                    dep.code ? {
+                        type: dep.type,
+                        code: dep.code 
+                    } : {
+                        type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
+                        path: this.resolvePath(dep, nodePath.dirname(this.path))
+                    }
+                )));
+            }
 
-                if (meta.tags) {
-                    // we need to also include the dependencies of
-                    // any tags that are used by this template
-                    dependencies = dependencies.concat(meta.tags.map(tagPath => ({
-                        type: 'marko-dependencies',
-                        path: this.resolvePath(tagPath, nodePath.dirname(this.path))
-                    })));
-                }
+            if (meta.tags) {
+                // we need to also include the dependencies of
+                // any tags that are used by this template
+                dependencies = dependencies.concat(meta.tags.map(tagPath => ({
+                    type: 'marko-dependencies',
+                    path: this.resolvePath(tagPath, nodePath.dirname(this.path))
+                })));
             }
 
             return dependencies;
