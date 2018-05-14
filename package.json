@@ -11,7 +11,8 @@
     "url": "https://github.com/lasso-js/lasso-marko.git"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test"
+    "test": "mocha --ui bdd --reporter spec --timeout 10000 ./test",
+    "test:ci": "vertest --epilogue=verbose"
   },
   "author": "Patrick Steele-Idem <pnidem@gmail.com>",
   "contributors": [
@@ -23,10 +24,14 @@
     "chai": "^3.5.0",
     "lasso": "^3.1.4",
     "marko": "^4.3.1",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "vertest": "^1.0.1"
   },
-  "peerDependencies": {},
-  "license": "Apache License v2.0",
+  "peerDependencies": {
+    "lasso": "^3 || ^2.11",
+    "marko": "^4.7"
+  },
+  "license": "Apache-2.0",
   "bin": {},
   "main": "./lasso-marko-plugin.js",
   "publishConfig": {

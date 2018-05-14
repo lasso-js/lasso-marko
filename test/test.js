@@ -77,6 +77,8 @@ describe('lasso-marko' , function() {
     });
 
     it('should bundle a simple marko dependency tree that uses dependencies', function() {
+        if (require('lasso/package').version[0] < 3) this.skip();
+        
         var myLasso = lasso.create(config);
 
         return myLasso.lassoPage({
@@ -98,6 +100,8 @@ describe('lasso-marko' , function() {
     });
 
     it('should bundle a simple marko dependency tree that uses hydrate', function() {
+        if (require('lasso/package').version[0] < 3) this.skip();
+
         var myLasso = lasso.create(config);
 
         return myLasso.lassoPage({
