@@ -7,6 +7,11 @@ var isDevelopment =
 
 var callbackify = require('callbackify');
 var nodePath = require('path');
+var lassoVersion = require('lasso/package').version.split('.');
+var markoVersion = require('marko/package').version.split('.');
+
+// marko package types are supported with lasso >= 3 and marko >= 4.7
+var isPackageTypesSupported = lassoVersion[0] >= 3 && (markoVersion[0] > 4 || (markoVersion[0] == 4 && markoVersion[1] >= 7));
 
 module.exports = function(lasso, config) {
     config = config || {};
@@ -62,97 +67,99 @@ module.exports = function(lasso, config) {
         }
     });
 
-    lasso.dependencies.registerPackageType('marko-dependencies', {
-        properties: { 'path': 'string' },
+    if (isPackageTypesSupported) {
+        lasso.dependencies.registerPackageType('marko-dependencies', {
+            properties: { 'path': 'string' },
 
-        init: callbackify(function(lassoContext) {
-            this.path = this.resolvePath(this.path);
+            init: callbackify(function(lassoContext) {
+                this.path = this.resolvePath(this.path);
 
-            if (this.path.endsWith('.marko')) {
-                return compile(this.path).then(compiled => this._compiled = compiled);
-            }
-        }),
-
-        getDependencies: function(lassoContext) {
-            if (!this._compiled) {
-                return [];
-            }
-
-            var meta = this._compiled.meta;
-            var dependencies = [];
-
-            if (meta.component) {
-                dependencies = dependencies.concat({
-                    type:'require',
-                    run: true,
-                    virtualModule: getVirtualModule({
-                        path: this.path + '.register.js',
-                        code: `require('marko/components').register(
-                            '${meta.id}',
-                            require('${meta.component}')
-                        );`
-                    })
-                });
-            } 
-            
-            if (meta.deps) {
-                dependencies = dependencies.concat(meta.deps.map(dep => (
-                    dep.code ? {
-                        type: dep.type,
-                        code: dep.code 
-                    } : {
-                        type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
-                        path: this.resolvePath(dep, nodePath.dirname(this.path))
-                    }
-                )));
-            }
-
-            if (meta.tags) {
-                // we need to also include the dependencies of
-                // any tags that are used by this template
-                dependencies = dependencies.concat(meta.tags.map(tagPath => ({
-                    type: 'marko-dependencies',
-                    path: this.resolvePath(tagPath, nodePath.dirname(this.path))
-                })));
-            }
-
-            return dependencies;
-        },
-
-        calculateKey () {
-            return 'marko-dependencies:'+this.path;
-        }
-    });
-
-    lasso.dependencies.registerPackageType('marko-hydrate', {
-        properties: { 'path': 'string' },
-
-        init: callbackify(function(lassoContext) {
-            this.path = this.resolvePath(this.path);
-            return compile(this.path).then(compiled => this._compiled = compiled);
-        }),
-
-        getDependencies: function() {
-            return [
-                {
-                    type: 'marko-dependencies',
-                    path: require.resolve(this.resolvePath(this.path))
-                },
-                {
-                    type: 'require',
-                    run: true,
-                    virtualModule: getVirtualModule({
-                        path: this.path + '.init.js',
-                        code: `window.$initComponents && window.$initComponents()`
-                    })
+                if (this.path.endsWith('.marko')) {
+                    return compile(this.path).then(compiled => this._compiled = compiled);
                 }
-            ];
-        },
+            }),
 
-        calculateKey () {
-            return 'marko-hydrate:'+this.path;
-        }
-    });
+            getDependencies: function(lassoContext) {
+                if (!this._compiled) {
+                    return [];
+                }
+
+                var meta = this._compiled.meta;
+                var dependencies = [];
+
+                if (meta.component) {
+                    dependencies = dependencies.concat({
+                        type:'require',
+                        run: true,
+                        virtualModule: getVirtualModule({
+                            path: this.path + '.register.js',
+                            code: `require('marko/components').register(
+                                '${meta.id}',
+                                require('${meta.component}')
+                            );`
+                        })
+                    });
+                } 
+                
+                if (meta.deps) {
+                    dependencies = dependencies.concat(meta.deps.map(dep => (
+                        dep.code ? {
+                            type: dep.type,
+                            code: dep.code 
+                        } : {
+                            type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
+                            path: this.resolvePath(dep, nodePath.dirname(this.path))
+                        }
+                    )));
+                }
+
+                if (meta.tags) {
+                    // we need to also include the dependencies of
+                    // any tags that are used by this template
+                    dependencies = dependencies.concat(meta.tags.map(tagPath => ({
+                        type: 'marko-dependencies',
+                        path: this.resolvePath(tagPath, nodePath.dirname(this.path))
+                    })));
+                }
+
+                return dependencies;
+            },
+
+            calculateKey () {
+                return 'marko-dependencies:'+this.path;
+            }
+        });
+
+        lasso.dependencies.registerPackageType('marko-hydrate', {
+            properties: { 'path': 'string' },
+
+            init: callbackify(function(lassoContext) {
+                this.path = this.resolvePath(this.path);
+                return compile(this.path).then(compiled => this._compiled = compiled);
+            }),
+
+            getDependencies: function() {
+                return [
+                    {
+                        type: 'marko-dependencies',
+                        path: require.resolve(this.resolvePath(this.path))
+                    },
+                    {
+                        type: 'require',
+                        run: true,
+                        virtualModule: getVirtualModule({
+                            path: this.path + '.init.js',
+                            code: `window.$initComponents && window.$initComponents()`
+                        })
+                    }
+                ];
+            },
+
+            calculateKey () {
+                return 'marko-hydrate:'+this.path;
+            }
+        });
+    }
 };
 
 function getVirtualModule(module) {

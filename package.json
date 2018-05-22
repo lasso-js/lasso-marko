@@ -25,11 +25,12 @@
     "lasso": "^3.1.4",
     "marko": "^4.3.1",
     "mocha": "^3.2.0",
+    "semver": "^5.5.0",
     "vertest": "^1.0.1"
   },
   "peerDependencies": {
-    "lasso": "^3 || ^2.11",
-    "marko": "^4.7"
+    "lasso": "^2.11.9 || ^3",
+    "marko": "^3.4.5 || ^4"
   },
   "license": "Apache-2.0",
   "bin": {},
