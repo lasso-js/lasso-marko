@@ -155,7 +155,6 @@ describe('lasso-marko' , function() {
         }).then((lassoPageResult) => {
             var JS = fs.readFileSync(nodePath.join(__dirname, 'static/hydrate.js'), {encoding: 'utf8'});
             var CSS = fs.readFileSync(nodePath.join(__dirname, 'static/hydrate.css'), {encoding: 'utf8'});
-            expect(JS).to.not.contain("stateful.marko");
             expect(JS).to.not.contain("input.name");
             expect(JS).to.contain("TEST");
             expect(CSS).to.contain("blue");
@@ -178,7 +177,6 @@ describe('lasso-marko' , function() {
         }).then((lassoPageResult) => {
             var JS = fs.readFileSync(nodePath.join(__dirname, 'static/dependencies.js'), {encoding: 'utf8'});
             var CSS = fs.readFileSync(nodePath.join(__dirname, 'static/dependencies.css'), {encoding: 'utf8'});
-            expect(JS).to.not.contain("split.marko");
             expect(JS).to.not.contain("TEMPLATE");
             expect(JS).to.contain("TEST");
             expect(JS).to.contain("MOUNT");

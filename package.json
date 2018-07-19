@@ -21,12 +21,12 @@
   ],
   "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "lasso": "^3.1.4",
-    "marko": "^4.3.1",
-    "mocha": "^3.2.0",
+    "chai": "^4.1.2",
+    "lasso": "^3.2.1",
+    "marko": "^4.12.1",
+    "mocha": "^5.2.0",
     "semver": "^5.5.0",
-    "vertest": "^1.0.1"
+    "vertest": "^1.0.2"
   },
   "peerDependencies": {
     "lasso": "^2.11.9 || ^3",

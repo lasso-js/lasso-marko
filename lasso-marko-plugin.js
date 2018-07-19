@@ -173,9 +173,6 @@ function getVirtualModule(module) {
             } else {
                 return code;
             }
-        },
-        getDefaultBundleName: function(_, __) {
-            return virtualPath;
         }
     }
 }
