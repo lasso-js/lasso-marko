@@ -13,6 +13,8 @@ var markoVersion = require('marko/package').version.split('.');
 // marko package types are supported with lasso >= 3 and marko >= 4.7
 var isPackageTypesSupported = lassoVersion[0] >= 3 && (markoVersion[0] > 4 || (markoVersion[0] == 4 && markoVersion[1] >= 7));
 
+console.log(lassoVersion, markoVersion, isPackageTypesSupported, markoVersion[1], markoVersion[1] >= 7);
+
 module.exports = function(lasso, config) {
     config = config || {};
 
@@ -94,8 +96,8 @@ module.exports = function(lasso, config) {
                         virtualModule: getVirtualModule({
                             path: this.path + '.register.js',
                             code: `require('marko/components').register(
-                                '${meta.id}',
-                                require('${meta.component}')
+                                ${JSON.stringify(meta.id)},
+                                require(${JSON.stringify(meta.component)})
                             );`
                         })
                     });
