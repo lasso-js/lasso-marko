@@ -84,6 +84,7 @@ module.exports = function(lasso, config) {
                     return [];
                 }
 
+                var dir = nodePath.dirname(this.path)
                 var meta = this._compiled.meta;
                 var dependencies = [];
 
@@ -104,11 +105,12 @@ module.exports = function(lasso, config) {
                 if (meta.deps) {
                     dependencies = dependencies.concat(meta.deps.map(dep => (
                         dep.code ? {
+                            path: dep.path && this.resolvePath(dep.path, dir),
                             type: dep.type,
                             code: dep.code 
                         } : {
                             type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
-                            path: this.resolvePath(dep, nodePath.dirname(this.path))
+                            path: this.resolvePath(dep, dir)
                         }
                     )));
                 }
@@ -118,7 +120,7 @@ module.exports = function(lasso, config) {
                     // any tags that are used by this template
                     dependencies = dependencies.concat(meta.tags.map(tagPath => ({
                         type: 'marko-dependencies',
-                        path: this.resolvePath(tagPath, nodePath.dirname(this.path))
+                        path: this.resolvePath(tagPath, dir)
                     })));
                 }
 
