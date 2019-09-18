@@ -151,7 +151,9 @@ module.exports = function(lasso, config) {
                         run: true,
                         virtualModule: getVirtualModule({
                             path: this.path + '.init.js',
-                            code: `window.$initComponents && window.$initComponents()`
+                            code: config.runtimeId
+                                ? `require("marko/components").init(${JSON.stringify(config.runtimeId)})`
+                                : `window.$initComponents && window.$initComponents()`
                         })
                     }
                 ];

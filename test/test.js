@@ -163,6 +163,33 @@ describe('lasso-marko' , function() {
         });
     });
 
+    it('should bundle a simple marko dependency tree that uses hydrate with a custom runtimeId', function() {
+        if (!isPackageTypesSupported) return this.skip();
+
+        var myLasso = lasso.create(Object.assign({}, config, {
+            plugins: [{
+                plugin: markoPlugin,
+                config: { runtimeId: "test" }
+            }]
+        }));
+
+        return myLasso.lassoPage({
+            name: 'hydrate-runtimeid',
+            dependencies: [
+                'marko-hydrate: ./stateful.marko'
+            ],
+            from: nodePath.join(__dirname, 'fixtures/meta-stateful')
+        }).then((lassoPageResult) => {
+            var JS = fs.readFileSync(nodePath.join(__dirname, 'static/hydrate-runtimeid.js'), {encoding: 'utf8'});
+            var CSS = fs.readFileSync(nodePath.join(__dirname, 'static/hydrate-runtimeid.css'), {encoding: 'utf8'});
+            expect(JS).to.not.contain("input.name");
+            expect(JS).to.contain("TEST");
+            expect(CSS).to.contain("blue");
+            expect(CSS).to.contain("red");
+            return lasso.flushAllCaches();
+        });
+    });
+
     it('should bundle a split component with its dependencies', function() {
         if (!isPackageTypesSupported) return this.skip();
 
