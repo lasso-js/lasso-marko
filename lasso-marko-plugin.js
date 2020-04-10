@@ -89,6 +89,10 @@ module.exports = function(lasso, config) {
                 var dependencies = [];
 
                 if (meta.component) {
+                    let componentRequire = `require(${JSON.stringify(meta.component)})`;
+                    if (meta.legacy) {
+                        componentRequire = `require("marko-widgets").defineWidget(${componentRequire})`
+                    }
                     dependencies = dependencies.concat({
                         type:'require',
                         run: true,
@@ -96,7 +100,7 @@ module.exports = function(lasso, config) {
                             path: this.path + '.register.js',
                             code: `require('marko/components').register(
                                 ${JSON.stringify(meta.id)},
-                                require(${JSON.stringify(meta.component)})
+                                ${componentRequire}
                             );`
                         })
                     });
