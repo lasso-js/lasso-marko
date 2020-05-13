@@ -20,6 +20,22 @@ require('lasso').configure({
 });
 ```
 
+Enable cache for production:
+```js
+require('lasso').configure({
+    "plugins": [
+        ...
+        {
+            "plugin": "lasso-marko",
+            "config": {
+                "useCache": true
+            }
+        }
+    ]
+    ...
+});
+```
+
 Required Marko templates will automatically be found via static code analysis as long as they are loaded using `require.resolve(path)` and rendered using code similar to the following (inside a CommonJS module):
 
 ```javascript
