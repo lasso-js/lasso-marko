@@ -24,19 +24,36 @@ module.exports = function(lasso, config) {
         output: config.output || defaultOutput
     };
 
+    var cache;
+
+    if (config.useCache) {
+        cache = {};
+    }
+
     function compile(path) {
         if (!path) {
             throw new Error('"path" is required for a Marko dependency');
         }
 
         return new Promise((resolve, reject) => {
+            var compilation = cache && cache[path];
+            if (compilation) {
+                return resolve(compilation);
+            }
             if (compiler.compileFileForBrowser) {
-                resolve(compiler.compileFileForBrowser(path, compilerOptions));
+                compilation = compiler.compileFileForBrowser(path, compilerOptions)
+                if (cache) {
+                    cache[path] = compilation;
+                }
+                resolve(compilation);
             } else {
                 compiler.compileFile(path, compilerOptions, function (err, code) {
                     if (err) return reject(err);
-
-                    resolve({ code: code });
+                    compilation = { code: code };
+                    if (cache) {
+                        cache[path] = compilation;
+                    }
+                    resolve(compilation);
                 });
             }
         });

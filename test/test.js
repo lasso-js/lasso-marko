@@ -211,4 +211,104 @@ describe('lasso-marko' , function() {
             return lasso.flushAllCaches();
         });
     });
+
+    describe('should use cache for repeated compilation requests', function() {
+        var compiler = require('marko/compiler');
+        var compileFileForBrowser = compiler.compileFileForBrowser;
+        var createConfig = useCache => {
+            return {
+                fileWriter: {
+                    fingerprintsEnabled: false,
+                    outputDir: nodePath.join(__dirname, 'static')
+                },
+                bundlingEnabled: true,
+                require: {
+                    includeClient: false
+                },
+                plugins: [
+                    {
+                        plugin: markoPlugin,
+                        config: {
+                            useCache: useCache,
+                            compiler: compiler
+                        }
+                    }
+                ]
+            };
+        };
+
+        after(function() {
+            compiler.compileFileForBrowser = compileFileForBrowser;
+        });
+    
+        it('with cache enabled', function() {
+            if (!isPackageTypesSupported) return this.skip();
+
+            var counter = 0;
+            compiler.compileFileForBrowser = function() {
+                counter++;
+                return compileFileForBrowser.apply(compiler, arguments);
+            };
+    
+            var myLasso = lasso.create(createConfig(true));
+    
+            return myLasso.lassoPage({
+                name: 'dependencies',
+                dependencies: [
+                    'require: ./main.marko'
+                ],
+                from: nodePath.join(__dirname, 'fixtures/cache'),
+                flags: [1]
+            }).then(() => {
+                expect(counter).to.equal(1);
+            }).then(() => {
+                return myLasso.lassoPage({
+                    name: 'dependencies',
+                    dependencies: [
+                        'require: ./main.marko'
+                    ],
+                    from: nodePath.join(__dirname, 'fixtures/cache'),
+                    flags: [2]
+                }).then(() => {
+                    expect(counter).to.equal(1);
+                    return lasso.flushAllCaches();
+                });
+            });
+        });
+
+        it('with cache disabled', function() {
+            if (!isPackageTypesSupported) return this.skip();
+
+            var counter = 0;
+            compiler.compileFileForBrowser = function() {
+                counter++;
+                return compileFileForBrowser.apply(compiler, arguments);
+            };
+    
+            var myLasso = lasso.create(createConfig(false));
+    
+            return myLasso.lassoPage({
+                name: 'dependencies',
+                dependencies: [
+                    'require: ./main.marko'
+                ],
+                from: nodePath.join(__dirname, 'fixtures/cache'),
+                flags: [1]
+            }).then(() => {
+                expect(counter).to.equal(1);
+            }).then(() => {
+                return myLasso.lassoPage({
+                    name: 'dependencies',
+                    dependencies: [
+                        'require: ./main.marko'
+                    ],
+                    from: nodePath.join(__dirname, 'fixtures/cache'),
+                    flags: [2]
+                }).then(() => {
+                    expect(counter).to.equal(2);
+                    return lasso.flushAllCaches();
+                });
+            });
+        });
+    })
 });
