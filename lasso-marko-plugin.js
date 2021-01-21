@@ -203,6 +203,8 @@ function getVirtualModule(module) {
 }
 
 function toLassoDep(dep) {
+    var dir = nodePath.dirname(this.path);
+
     if (typeof dep === 'string') {
         var match = /^(?:([\w-]+)(?::\s*|\s+))?(.*?(?:\.(\w+))?)$/.exec(dep);
         dep = {
@@ -219,7 +221,7 @@ function toLassoDep(dep) {
     }
 
     if (dep.path) {
-        dep.path = this.resolvePath(dep.path);
+        dep.path = this.resolvePath(dep.path, dir);
 
         if (dep.path && !dep.type) {
             dep.type = dep.path.slice(dep.path.lastIndexOf('.') + 1);
@@ -227,7 +229,7 @@ function toLassoDep(dep) {
     }
 
     if (dep.virtualPath) {
-        dep.virtualPath = nodePath.resolve(nodePath.dirname(this.path), dep.virtualPath);
+        dep.virtualPath = nodePath.resolve(dir, dep.virtualPath);
     }
 
     if (dep.type === 'js') {
