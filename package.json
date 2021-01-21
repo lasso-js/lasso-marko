@@ -23,14 +23,14 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "lasso": "^3.2.1",
-    "marko": "^4.12.1",
-    "mocha": "^5.2.0",
+    "marko": "^5.0.0",
+    "mocha": "^8.2.1",
     "semver": "^5.5.0",
     "vertest": "^1.0.2"
   },
   "peerDependencies": {
     "lasso": "^2.11.9 || ^3",
-    "marko": "^3.4.5 || ^4"
+    "marko": "^3.4.5 || ^4 || ^5"
   },
   "license": "Apache-2.0",
   "bin": {},

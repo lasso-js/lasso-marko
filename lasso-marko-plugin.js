@@ -1,10 +1,5 @@
 'use strict';
 
-var isDevelopment =
-    !process.env.NODE_ENV ||
-    process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'dev';
-
 var callbackify = require('callbackify');
 var nodePath = require('path');
 var lassoVersion = require('lasso/package').version.split('.');
@@ -20,8 +15,13 @@ module.exports = function(lasso, config) {
 
     var defaultOutput = compiler.isVDOMSupported ? 'vdom' : 'html';
 
+    var lassoConfig = lasso.config.rawConfig;
     var compilerOptions = {
-        output: config.output || defaultOutput
+        output: config.output || defaultOutput,
+        babelConfig: config.babelConfig,
+        sourceMaps: !(lassoConfig.bundlingEnabled || lassoConfig.minify) && 'inline',
+        cache: new Map(),
+        modules: 'cjs'
     };
 
     var cache;
@@ -76,7 +76,15 @@ module.exports = function(lasso, config) {
         }),
 
         getDependencies: function(lassoContext) {
-            return this._compiled.dependencies || [];
+            if (this._compiled.dependencies) {
+                return this._compiled.dependencies;
+            }
+
+            if (this._compiled.meta) {
+                return (this._compiled.meta.deps || []).map(toLassoDep, this);
+            }
+
+            return [];
         },
 
         read: function(lassoContext) {
@@ -115,25 +123,17 @@ module.exports = function(lasso, config) {
                         run: true,
                         virtualModule: getVirtualModule({
                             path: this.path + '.register.js',
-                            code: `require('marko/components').register(
-                                ${JSON.stringify(meta.id)},
-                                ${componentRequire}
-                            );`
+                            code: `var component = ${
+                                componentRequire
+                            };\nrequire('marko/components').register(${
+                                JSON.stringify(meta.id)
+                            }, component.default || component);`
                         })
                     });
-                } 
-                
+                }
+
                 if (meta.deps) {
-                    dependencies = dependencies.concat(meta.deps.map(dep => (
-                        dep.code ? {
-                            path: dep.path && this.resolvePath(dep.path, dir),
-                            type: dep.type,
-                            code: dep.code 
-                        } : {
-                            type: dep.includes(':') ? dep.slice(0, dep.indexOf(':')) : 'require',
-                            path: this.resolvePath(dep, dir)
-                        }
-                    )));
+                    dependencies = dependencies.concat(meta.deps.map(toLassoDep, this));
                 }
 
                 if (meta.tags) {
@@ -200,4 +200,40 @@ function getVirtualModule(module) {
             }
         }
     }
+}
+
+function toLassoDep(dep) {
+    if (typeof dep === 'string') {
+        var match = /^(?:([\w-]+)(?::\s*|\s+))?(.*?(?:\.(\w+))?)$/.exec(dep);
+        dep = {
+            type: match[1] || match[3],
+            path: match[2]
+        };
+    } else {
+        dep = {
+            type: dep.type,
+            path: dep.path,
+            code: dep.code,
+            virtualPath: dep.virtualPath
+        };
+    }
+
+    if (dep.path) {
+        dep.path = this.resolvePath(dep.path);
+
+        if (dep.path && !dep.type) {
+            dep.type = dep.path.slice(dep.path.lastIndexOf('.') + 1);
+        }
+    }
+
+    if (dep.virtualPath) {
+        dep.virtualPath = nodePath.resolve(nodePath.dirname(this.path), dep.virtualPath);
+    }
+
+    if (dep.type === 'js') {
+        dep.type = 'require';
+        dep.run = true;
+    }
+
+    return dep;
 }
