@@ -7,6 +7,7 @@ var markoVersion = require('marko/package').version.split('.');
 
 // marko package types are supported with lasso >= 3 and marko >= 4.7
 var isPackageTypesSupported = lassoVersion[0] >= 3 && (markoVersion[0] > 4 || (markoVersion[0] == 4 && markoVersion[1] >= 7));
+var isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 module.exports = function(lasso, config) {
     config = config || {};
@@ -24,39 +25,49 @@ module.exports = function(lasso, config) {
         modules: 'cjs'
     };
 
-    var cache;
-
+    var sharedCache;
     if (config.useCache) {
-        cache = {};
+        sharedCache = new Map();
+    } else {
+        sharedCache = new WeakMap();
+        lasso.on('afterLassoPage', ({ context }) => {
+            sharedCache.delete(context);
+        });
     }
 
-    function compile(path) {
+    function compile(path, lassoContext) {
         if (!path) {
             throw new Error('"path" is required for a Marko dependency');
         }
 
-        return new Promise((resolve, reject) => {
-            var compilation = cache && cache[path];
-            if (compilation) {
-                return resolve(compilation);
+        var cache;
+
+        if (config.useCache) {
+            cache = sharedCache;
+        } else {
+            cache = sharedCache.get(lassoContext);
+
+            if (!cache) {
+                sharedCache.set(lassoContext, cache = new Map());
             }
-            if (compiler.compileFileForBrowser) {
-                compilation = compiler.compileFileForBrowser(path, compilerOptions)
-                if (cache) {
-                    cache[path] = compilation;
+        }
+
+        var cached = cache.get(path);
+
+        if (!cached) {
+            cache.set(path, cached = new Promise((resolve, reject) => {
+                if (compiler.compileFileForBrowser) {
+                    resolve(compiler.compileFileForBrowser(path, compilerOptions));
+                } else {
+                    compiler.compileFile(path, compilerOptions, function (err, code) {
+                        if (err) return reject(err);
+                        resolve({ code: code });
+                    });
                 }
-                resolve(compilation);
-            } else {
-                compiler.compileFile(path, compilerOptions, function (err, code) {
-                    if (err) return reject(err);
-                    compilation = { code: code };
-                    if (cache) {
-                        cache[path] = compilation;
-                    }
-                    resolve(compilation);
-                });
-            }
-        });
+            }));
+        }
+
+        return cached;
     }
 
     lasso.dependencies.registerRequireType('marko', {
@@ -64,15 +75,42 @@ module.exports = function(lasso, config) {
 
         init: callbackify(function(lassoContext) {
             this.path = this.resolvePath(this.path);
-            return compile(this.path).then(compiled => this._compiled = compiled);
+            return compile(this.path, lassoContext).then(compiled => this._compiled = compiled);
         }),
 
-        getLastModified: callbackify(function(lassoContext) {
-            return new Promise((resolve, reject) => {
-                compiler.getLastModified(this.path, function (err, data) {
-                    return err ? reject(err) : resolve(data);
+        getLastModified: callbackify(function (lassoContext) {
+            if (!isDev || config.useCache) {
+                return Promise.resolve(1);
+            }
+
+            const watchFiles = this._compiled && this._compiled.meta && this._compiled.meta.watchFiles;
+            
+            if (watchFiles) {
+                return new Promise((resolve) => {
+                    let remaining = watchFiles.length;
+                    let maxMtime = -1;
+                    for (const watchFile of watchFiles.concat(this.path)) {
+                        lassoContext.cachingFs.stat(watchFile, (err, stat) => {
+                            if (remaining) {
+                                if (err) {
+                                    remaining = 0;
+                                    resolve(-1);
+                                } else {
+                                    if (stat._lastModified > maxMtime) {
+                                        maxMtime = stat._lastModified;
+                                    }
+
+                                    if (--remaining === 0) {
+                                        resolve(maxMtime);
+                                    }
+                                }
+                            }
+                        });
+                    }
                 });
-            });
+            } else {
+                return Promise.resolve(-1);
+            }
         }),
 
         getDependencies: function(lassoContext) {
@@ -100,7 +138,7 @@ module.exports = function(lasso, config) {
                 this.path = this.resolvePath(this.path);
 
                 if (this.path.endsWith('.marko')) {
-                    return compile(this.path).then(compiled => this._compiled = compiled);
+                    return compile(this.path, lassoContext).then(compiled => this._compiled = compiled);
                 }
             }),
 
@@ -158,7 +196,6 @@ module.exports = function(lasso, config) {
 
             init: callbackify(function(lassoContext) {
                 this.path = this.resolvePath(this.path);
-                return compile(this.path).then(compiled => this._compiled = compiled);
             }),
 
             getDependencies: function() {
