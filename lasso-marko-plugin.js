@@ -15,9 +15,11 @@ module.exports = function(lasso, config) {
     var compiler = config.compiler || require('marko/compiler');
 
     var defaultOutput = compiler.isVDOMSupported ? 'vdom' : 'html';
+    var compileFile = compiler.compileFileForBrowser || compiler.compileFile;
 
     var lassoConfig = lasso.config.rawConfig;
     var compilerOptions = {
+        sourceOnly: false,
         output: config.output || defaultOutput,
         babelConfig: config.babelConfig,
         sourceMaps: !(lassoConfig.bundlingEnabled || lassoConfig.minify) && 'inline',
@@ -34,6 +36,27 @@ module.exports = function(lasso, config) {
             sharedCache.delete(context);
         });
     }
+
+    lasso.on('lassoCacheCreated', function(cacheInfo) {
+        var lassoCache = cacheInfo.lassoCache;
+
+        lassoCache.configureCacheDefaults({
+            '*': { // Any profile
+                'marko/meta': {
+                    store: 'memory',
+                    encoding: 'utf8',
+                    valueType: 'json'
+                }
+            },
+            'production': {
+                'marko/meta': {
+                    store: 'disk',
+                    encoding: 'utf8',
+                    valueType: 'json'
+                }
+            }
+        });
+    });
 
     function compile(path, lassoContext) {
         if (!path) {
@@ -52,22 +75,52 @@ module.exports = function(lasso, config) {
             }
         }
 
-        var cached = cache.get(path);
+        var cachedCode = cache.get(path);
 
-        if (!cached) {
-            cache.set(path, cached = new Promise((resolve, reject) => {
-                if (compiler.compileFileForBrowser) {
-                    resolve(compiler.compileFileForBrowser(path, compilerOptions));
-                } else {
-                    compiler.compileFile(path, compilerOptions, function (err, code) {
-                        if (err) return reject(err);
-                        resolve({ code: code });
-                    });
-                }
-            }));
+        if (!cachedCode) {
+            cache.set(
+                path,
+                (cachedCode = new Promise((resolve, reject) => {
+                    compileFile(
+                        path,
+                        compilerOptions,
+                        (err, compiled) => {
+                            if (err) return reject(err);
+                            const rawMeta = compiled.meta || {};
+                            const meta = {
+                                id: rawMeta.id,
+                                tags: rawMeta.tags,
+                                legacy: rawMeta.legacy,
+                                component: rawMeta.component,
+                                watchFiles: rawMeta.watchFiles,
+                                deps: (compiled.dependencies || rawMeta.deps || []),
+                            };
+
+                            lassoContext.cache
+                                .getCache("marko/meta")
+                                .put(path, meta);
+
+                            resolve({
+                                code: compiled.code || compiled,
+                                meta: meta
+                            });
+                        }
+                    );
+                }))
+            );
         }
 
-        return cached;
+        return cachedCode;
+    }
+
+    function getMeta(path, lassoContext) {
+        return lassoContext.cache
+            .getCache("marko/meta")
+            .get(path, {
+                builder() {
+                    return compile(path, lassoContext).then(result => result.meta)
+                }
+            });
     }
 
     lasso.dependencies.registerRequireType('marko', {
@@ -75,59 +128,41 @@ module.exports = function(lasso, config) {
 
         init: callbackify(function(lassoContext) {
             this.path = this.resolvePath(this.path);
-            return compile(this.path, lassoContext).then(compiled => this._compiled = compiled);
+            return Promise.resolve();
         }),
 
-        getLastModified: callbackify(function (lassoContext) {
+        getLastModified: callbackify(function(lassoContext) {
             if (!isDev || config.useCache) {
                 return Promise.resolve(1);
             }
 
-            const watchFiles = this._compiled && this._compiled.meta && this._compiled.meta.watchFiles;
-            
-            if (watchFiles) {
-                return new Promise((resolve) => {
-                    let remaining = watchFiles.length;
-                    let maxMtime = -1;
-                    for (const watchFile of watchFiles.concat(this.path)) {
-                        lassoContext.cachingFs.stat(watchFile, (err, stat) => {
-                            if (remaining) {
-                                if (err) {
-                                    remaining = 0;
-                                    resolve(-1);
-                                } else {
-                                    if (stat._lastModified > maxMtime) {
-                                        maxMtime = stat._lastModified;
-                                    }
+            return getMeta(this.path, lassoContext).then((meta) => {
+                const watchFiles = meta.watchFiles;
+    
+                if (!watchFiles) {
+                    return -1;
+                }
+    
+                return Promise.all(
+                    watchFiles
+                        .concat(this.path)
+                        .map((file) => lassoContext.getFileLastModified(file))
+                )
+                    .then((times) => Math.max(...times))
+                    .catch(() => -1);
+            });
+        }
+    ),
 
-                                    if (--remaining === 0) {
-                                        resolve(maxMtime);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                });
-            } else {
-                return Promise.resolve(-1);
-            }
+        getDependencies: callbackify(function(lassoContext) {
+            return getMeta(this.path, lassoContext).then((meta) =>
+                (meta.deps || []).map(toLassoDep, this)
+            );
         }),
 
-        getDependencies: function(lassoContext) {
-            if (this._compiled.dependencies) {
-                return this._compiled.dependencies;
-            }
-
-            if (this._compiled.meta) {
-                return (this._compiled.meta.deps || []).map(toLassoDep, this);
-            }
-
-            return [];
-        },
-
-        read: function(lassoContext) {
-            return (this._compiled && this._compiled.code) || null;
-        }
+        read: callbackify(function(lassoContext) {
+            return compile(this.path, lassoContext).then(result => result.code);
+        })
     });
 
     if (isPackageTypesSupported) {
@@ -136,55 +171,53 @@ module.exports = function(lasso, config) {
 
             init: callbackify(function(lassoContext) {
                 this.path = this.resolvePath(this.path);
-
-                if (this.path.endsWith('.marko')) {
-                    return compile(this.path, lassoContext).then(compiled => this._compiled = compiled);
-                }
+                return Promise.resolve();
             }),
 
-            getDependencies: function(lassoContext) {
-                if (!this._compiled) {
-                    return [];
-                }
-
-                var dir = nodePath.dirname(this.path)
-                var meta = this._compiled.meta;
-                var dependencies = [];
-
-                if (meta.component) {
-                    let componentRequire = `require(${JSON.stringify(meta.component)})`;
-                    if (meta.legacy) {
-                        componentRequire = `require("marko-widgets").defineWidget(${componentRequire})`
-                    }
-                    dependencies = dependencies.concat({
-                        type:'require',
-                        run: true,
-                        virtualModule: getVirtualModule({
-                            path: this.path + '.register.js',
-                            code: `var component = ${
-                                componentRequire
-                            };\nrequire('marko/components').register(${
-                                JSON.stringify(meta.id)
-                            }, component.default || component);`
-                        })
+            getDependencies: callbackify(function(lassoContext) {
+                if (this.path.endsWith('.marko')) {
+                    return getMeta(this.path, lassoContext).then(meta => {
+                        var dir = nodePath.dirname(this.path)
+                        var dependencies = [];
+        
+                        if (meta.component) {
+                            let componentRequire = `require(${JSON.stringify(meta.component)})`;
+                            if (meta.legacy) {
+                                componentRequire = `require("marko-widgets").defineWidget(${componentRequire})`
+                            }
+                            dependencies = dependencies.concat({
+                                type:'require',
+                                run: true,
+                                virtualModule: getVirtualModule({
+                                    path: this.path + '.register.js',
+                                    code: `var component = ${
+                                        componentRequire
+                                    };\nrequire('marko/components').register(${
+                                        JSON.stringify(meta.id)
+                                    }, component.default || component);`
+                                })
+                            });
+                        }
+        
+                        if (meta.deps) {
+                            dependencies = dependencies.concat(meta.deps.map(toLassoDep, this));
+                        }
+        
+                        if (meta.tags) {
+                            // we need to also include the dependencies of
+                            // any tags that are used by this template
+                            dependencies = dependencies.concat(meta.tags.map(tagPath => ({
+                                type: 'marko-dependencies',
+                                path: this.resolvePath(tagPath, dir)
+                            })));
+                        }
+        
+                        return dependencies;
                     });
                 }
 
-                if (meta.deps) {
-                    dependencies = dependencies.concat(meta.deps.map(toLassoDep, this));
-                }
-
-                if (meta.tags) {
-                    // we need to also include the dependencies of
-                    // any tags that are used by this template
-                    dependencies = dependencies.concat(meta.tags.map(tagPath => ({
-                        type: 'marko-dependencies',
-                        path: this.resolvePath(tagPath, dir)
-                    })));
-                }
-
-                return dependencies;
-            },
+                return [];
+            }),
 
             calculateKey () {
                 return 'marko-dependencies:'+this.path;
