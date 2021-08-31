@@ -282,12 +282,20 @@ function toLassoDep(dep) {
             path: match[2]
         };
     } else {
-        dep = {
-            type: dep.type,
-            path: dep.path,
-            code: dep.code,
-            virtualPath: dep.virtualPath
-        };
+        // clone the dep and exclude additional metadata added by Marko
+        const original = dep;
+        dep = {};
+        for (const key in original) {
+            switch (key) {
+                case "map":
+                case "style":
+                case "endPos":
+                case "startPos":
+                    break;
+                default:
+                    dep[key] = original[key];
+            }
+        }
     }
 
     if (dep.path) {
