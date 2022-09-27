@@ -12,10 +12,12 @@ var isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 module.exports = function(lasso, config) {
     config = config || {};
 
-    var compiler = config.compiler || require('marko/compiler');
+    var compiler = config.compiler || (markoVersion[0] >= 5 ? require('@marko/compiler') : require('marko/compiler'));
 
     var defaultOutput = compiler.isVDOMSupported ? 'vdom' : 'html';
-    var compileFile = compiler.compileFileForBrowser || compiler.compileFile;
+    var compileFile = compiler.getRuntimeEntryFiles // check if we've got marko 5+ compiler
+        ? callbackify(compiler.compileFile)
+        : compiler.compileFileForBrowser || compiler.compileFile;
 
     var lassoConfig = lasso.config.rawConfig;
     var compilerOptions = {
