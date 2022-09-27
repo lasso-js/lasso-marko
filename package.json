@@ -29,7 +29,7 @@
     "vertest": "^1.0.2"
   },
   "peerDependencies": {
-    "lasso": "^2.11.9 || ^3",
+    "lasso": "^2.11.9 || >=3",
     "marko": "^3.4.5 || ^4 || ^5"
   },
   "license": "Apache-2.0",
