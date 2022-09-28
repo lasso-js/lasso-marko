@@ -1,6 +1,7 @@
 'use strict';
 
 var callbackify = require('callbackify');
+var promisify = require('util').promisify;
 var nodePath = require('path');
 var lassoVersion = require('lasso/package').version.split('.');
 var markoVersion = require('marko/package').version.split('.');
@@ -14,10 +15,17 @@ module.exports = function(lasso, config) {
 
     var compiler = config.compiler || (markoVersion[0] >= 5 ? require('@marko/compiler') : require('marko/compiler'));
 
-    var defaultOutput = compiler.isVDOMSupported ? 'vdom' : 'html';
-    var compileFile = compiler.getRuntimeEntryFiles // check if we've got marko 5+ compiler
-        ? callbackify(compiler.compileFile)
-        : compiler.compileFileForBrowser || compiler.compileFile;
+    var defaultOutput;
+    var compileFile;
+
+    // check if we've got marko 5+ compiler
+    if (compiler.getRuntimeEntryFiles) {
+        compileFile = compiler.compileFile;
+        defaultOutput = 'dom';
+    } else {
+        compileFile = promisify(compiler.compileFileForBrowser || compiler.compileFile);
+        defaultOutput = compiler.isVDOMSupported ? 'vdom' : 'html';
+    }
 
     var lassoConfig = lasso.config.rawConfig;
     var compilerOptions = {
@@ -82,32 +90,25 @@ module.exports = function(lasso, config) {
         if (!cachedCode) {
             cache.set(
                 path,
-                (cachedCode = new Promise((resolve, reject) => {
-                    compileFile(
-                        path,
-                        compilerOptions,
-                        (err, compiled) => {
-                            if (err) return reject(err);
-                            const rawMeta = compiled.meta || {};
-                            const meta = {
-                                id: rawMeta.id,
-                                tags: rawMeta.tags,
-                                legacy: rawMeta.legacy,
-                                component: rawMeta.component,
-                                watchFiles: rawMeta.watchFiles,
-                                deps: (compiled.dependencies || rawMeta.deps || []),
-                            };
+                (cachedCode = compileFile(path, compilerOptions).then((compiled) => {
+                    const rawMeta = compiled.meta || {};
+                    const meta = {
+                        id: rawMeta.id,
+                        tags: rawMeta.tags,
+                        legacy: rawMeta.legacy,
+                        component: rawMeta.component,
+                        watchFiles: rawMeta.watchFiles,
+                        deps: (compiled.dependencies || rawMeta.deps || []),
+                    };
 
-                            lassoContext.cache
-                                .getCache("marko/meta")
-                                .put(path, meta);
+                    lassoContext.cache
+                        .getCache("marko/meta")
+                        .put(path, meta);
 
-                            resolve({
-                                code: compiled.code || compiled,
-                                meta: meta
-                            });
-                        }
-                    );
+                    return {
+                        code: compiled.code || compiled,
+                        meta: meta
+                    };
                 }))
             );
         }
