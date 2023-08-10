@@ -1,6 +1,8 @@
 lasso-marko
 ===============
 
+_NOTE: lasso-marko@4 requires marko >= 5, @marko/compiler >= 5.33 and lasso >= 3. For older versions use lasso-marko@3._
+
 Plugin for the [Lasso.js](https://github.com/lasso-js/lasso) to support compilation and transport of [Marko](https://github.com/raptorjs/marko) template files. Templates are compiled using the [Marko](https://github.com/raptorjs/marko) compiler that produces a CommonJS module as output.
 
 # Usage
@@ -20,27 +22,10 @@ require('lasso').configure({
 });
 ```
 
-Enable cache for production:
-```js
-require('lasso').configure({
-    "plugins": [
-        ...
-        {
-            "plugin": "lasso-marko",
-            "config": {
-                "useCache": true
-            }
-        }
-    ]
-    ...
-});
-```
-
-Required Marko templates will automatically be found via static code analysis as long as they are loaded using `require.resolve(path)` and rendered using code similar to the following (inside a CommonJS module):
+Required Marko templates will automatically be found via static code analysis when loaded, eg like:
 
 ```javascript
-// Template must be loaded using require.resolve!
-var template = require('marko').load(require.resolve('./template.marko'));
+var template = require('./template.marko');
 
 template.render({
         name: 'Frank'
@@ -50,17 +35,15 @@ template.render({
     });
 ```
 
-To explicitly declare templates that may not be discovered via static code analysis of CommonJS modules, you can also choose to declare a Marko template dependency in an `browser.json` file.
+To explicitly declare templates that may not be discovered via static code analysis of CommonJS modules, you can also choose to declare Marko template dependencies in an `browser.json` file.
 
 ```json
 {
     "dependencies": [
-        "template.marko"
+        "marko-dependencies: ./template.marko"
     ]
 }
 ```
-
-_NOTE: No configuration is supported by this module._
 
 # Contributors
 

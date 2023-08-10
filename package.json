@@ -1,45 +1,38 @@
 {
   "name": "lasso-marko",
+  "version": "3.2.1",
   "description": "Lasso.js plugin to support compilation of Marko templates",
   "keywords": [
     "lasso",
     "lasso-plugin",
     "marko"
   ],
+  "files": [
+    "package.json",
+    "lasso-marko-plugin.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/lasso-js/lasso-marko.git"
   },
+  "license": "MIT",
+  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
+  "main": "./lasso-marko-plugin.js",
   "scripts": {
     "test": "mocha --ui bdd --reporter spec --timeout 10000 ./test",
     "test:ci": "vertest --epilogue=verbose"
   },
-  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
-  "contributors": [
-    "Patrick Steele-Idem <pnidem@gmail.com>",
-    "Phillip Gates-Idem <phillip.idem@gmail.com>"
-  ],
-  "maintainers": "Patrick Steele-Idem <pnidem@gmail.com>",
   "devDependencies": {
+    "@marko/compiler": "^5.33.0",
     "chai": "^4.1.2",
-    "lasso": "^3.4.3",
-    "marko": "^5.0.0",
+    "lasso": "^4.0.3",
+    "marko": "^5.31.0",
     "mocha": "^8.2.1",
-    "semver": "^5.5.0",
     "vertest": "^1.0.2"
   },
   "peerDependencies": {
-    "lasso": "^2.11.9 || >=3",
-    "marko": "^3.4.5 || ^4 || ^5"
-  },
-  "license": "Apache-2.0",
-  "bin": {},
-  "main": "./lasso-marko-plugin.js",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "version": "3.2.1",
-  "dependencies": {
-    "callbackify": "^1.1.0"
+    "@marko/compiler": "^5.33.0",
+    "lasso": "3 - 4",
+    "marko": "^5"
   }
 }
