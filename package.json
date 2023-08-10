@@ -1,6 +1,6 @@
 {
   "name": "lasso-marko",
-  "version": "3.2.1",
+  "version": "4.0.0",
   "description": "Lasso.js plugin to support compilation of Marko templates",
   "keywords": [
     "lasso",
