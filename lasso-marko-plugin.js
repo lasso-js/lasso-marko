@@ -9,24 +9,41 @@ const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 if (markoCompilerVersion[0] < 5 || markoCompilerVersion[1] < 33) {
   throw new Error(
-    "lasso-marko-plugin@4 requires marko >= 5 and @marko/compiler >= 5.33, install lasso-marko-plugin@3 for older marko versions."
+    "lasso-marko-plugin@5 requires marko >= 5 and @marko/compiler >= 5.33, install lasso-marko-plugin@3 for older marko versions."
   );
 }
 
 if (lassoVersion[0] < 3) {
   throw new Error(
-    "lasso-marko-plugin@4 requires lasso >= 3, install lasso-marko-plugin@3 for older lasso versions."
+    "lasso-marko-plugin@5 requires lasso >= 3, install lasso-marko-plugin@3 for older lasso versions."
   );
 }
 
+const compiler = require("@marko/compiler");
+compiler.configure({
+  cache: new Map(),
+  optimizedRegistryIds: new Map(),
+});
+
 module.exports = function (lasso, config = {}) {
-  const { compiler = require("@marko/compiler") } = config;
   const lassoConfig = lasso.config.rawConfig;
   const isMultiFile = !(lassoConfig.bundlingEnabled || lassoConfig.minify);
   const baseConfig = {
     modules: "cjs",
-    cache: new Map(),
-    babelConfig: config.babelConfig,
+    babelConfig: config.babelConfig || {
+      comments: false,
+      compact: false,
+      babelrc: false,
+      configFile: false,
+      browserslistConfigFile: false,
+      caller: {
+        name: "lasso-marko",
+        supportsStaticESM: true,
+        supportsDynamicImport: true,
+        supportsTopLevelAwait: true,
+        supportsExportNamespaceFrom: true,
+      }
+    },
     writeVersionComment: isMultiFile,
     sourceMaps: isMultiFile && "inline",
     runtimeId: config.runtimeId,
