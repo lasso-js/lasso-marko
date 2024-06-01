@@ -22,7 +22,6 @@ if (lassoVersion[0] < 3) {
 const compiler = require("@marko/compiler");
 compiler.configure({
   cache: new Map(),
-  optimizedRegistryIds: new Map(),
 });
 
 module.exports = function (lasso, config = {}) {
