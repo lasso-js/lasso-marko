@@ -22,6 +22,7 @@ if (lassoVersion[0] < 3) {
 const compiler = require("@marko/compiler");
 compiler.configure({
   cache: new Map(),
+  getTemplateId: require("lasso-modules-client/transport").getClientPath
 });
 
 module.exports = function (lasso, config = {}) {
